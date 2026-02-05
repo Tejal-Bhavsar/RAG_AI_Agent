@@ -1,6 +1,7 @@
 import os
 from fastapi import FastAPI
 from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware # <--- 1. ADD THIS IMPORT
 
 from rag.pdf_to_text import pdf_to_text
 from rag.chunking import chunk_text
@@ -8,6 +9,20 @@ from rag.embedded_store import build_and_save_index, load_index
 from rag.rag_answer import retrieve, generate_answer
 
 app = FastAPI()
+
+# 2. ADD THIS CORS BLOCK
+origins = [
+    "http://localhost:5174",
+    "http://127.0.0.1:5174",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],  # This allows the 'OPTIONS' method that's currently failing
+    allow_headers=["*"],
+)
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 PDF_PATH = os.path.join(DATA_DIR, "knowledge.pdf")
